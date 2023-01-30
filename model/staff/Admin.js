@@ -9,6 +9,7 @@ const adminSchema = new mongoose.Schema(
     },
     email: {
       type: String,
+      unique: true,
       required: true,
     },
     password: {
@@ -66,6 +67,17 @@ const adminSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+//  Hash Pasword
+adminSchema.pre("save", function (next) {
+  this.password = bcrypt.hashSync(this.password, 10);
+  next();
+});
+
+//  Verify password
+adminSchema.methods.verifyPassword = function (password) {
+  return bcrypt.compareSync(password, this.password);
+};
 
 //model
 const Admin = mongoose.model("Admin", adminSchema);
